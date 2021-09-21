@@ -10,13 +10,13 @@
 
 ## About
 Tippy is a simple tip calculator. It also allows you to split the bill between multiple people.
-The app also fetches the current month average exchange rate based on euro and shows you what you're spending in the other supported currencies.
+The app also fetches the latest exchange rates based on the selected currency and shows you what you're spending in the other supported currencies.
 
 ## Features
 - Set tip percentage
 - Split bill between multiple people
 - See total per person and what amount each person is tipping
-- See what you're spending in other currencies (based on euro exchange rate)
+- See what you're spending in other currencies
 
 ## Technologies
 - expo (~42.0.1)

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Share, StatusBar } from 'react-native';
-import { Layout, Text, Input, ButtonGroup, Button, Select, SelectItem, IndexPath } from '@ui-kitten/components';
-import axios from "axios";
-
+import { StyleSheet, Share, StatusBar, Pressable, Linking } from 'react-native';
+import { Layout, Text, Input, ButtonGroup, Button, Select, SelectItem, IndexPath, Popover } from '@ui-kitten/components';
 
 export const Home = () => {
   const [selectedCurrency, setSelectedCurrency] = useState(new IndexPath(0));
@@ -10,10 +8,19 @@ export const Home = () => {
   const [billValue, setBillValue] = useState(0);
   const [tipPercentage, setTipPercentage] = useState(15);
   const [people, setPeople] = useState(1);
-  //Exchange rates
-  const [usd, setUsd] = useState(0);
-  const [eur, setEur] = useState(0);
-  const [lei, setLei] = useState(0);
+  const [currencyData, setCurrencyData] = useState({});
+  const [visible, setVisible] = useState(false);
+
+  const currencies = ['EUR','USD','RON','BGN','CZK','DKK','GBP','HRK','HUF','PLN','RUB','SEK','TRY'];
+
+  useEffect(() => {
+    fetch(`https://api.frankfurter.app/latest?from=${currencyISO}`)
+      .then(resp => resp.json())
+      .then((data) => {
+        setCurrencyData(data.rates);
+      })
+      .catch(err => console.log(err));
+  }, [currencyISO]);
 
   const morePeople = () => {
     setPeople(people + 1);
@@ -45,7 +52,37 @@ export const Home = () => {
         return 'USD';
         break;
       case 2:
-        return 'LEI';
+        return 'RON';
+        break;
+      case 3:
+        return 'BGN';
+        break;
+      case 4:
+        return 'CZK';
+        break;
+      case 5:
+        return 'DKK';
+        break;
+      case 6:
+        return 'GBP';
+        break;
+      case 7:
+        return 'HRK';
+        break;
+      case 8:
+        return 'HUF';
+        break;
+      case 9:
+        return 'PLN';
+        break;
+      case 10:
+        return 'RUB';
+        break;
+      case 11:
+        return 'SEK';
+        break;
+      case 12:
+        return 'TRY';
         break;
       default: 
         return 'EUR'
@@ -59,76 +96,45 @@ export const Home = () => {
       title: 'Calculated tips'
     });
   };
-
-  const fetchData = async () => {
-    let year = new Date().getFullYear();
-    let month = new Date().getMonth();
-    //USD
-    await axios.get(`https://ec.europa.eu/budg/inforeuro/api/public/monthly-rates?year=${year}&month=${month}&lang=en`)
-    .then(res => {
-      let data = res.data;
-      let romania = data.filter(x => x.isoA3Code == 'RON');
-      let usa = data.filter(x => x.isoA3Code == 'USD');
-      let eur = data.filter(x => x.isoA3Code == 'EUR')
-      console.log(romania, usa, eur);
-      setUsd(usa[0].value);
-      setLei(romania[0].value);
-    })
-    .catch(err => console.error('Error Loading Currencies', err));
-  };
-  useEffect(() => {
-    fetchData();
-  },[]);
-
-  const exchangeUsd = () => {
-    return (billValue * usd).toFixed(2);
-  }
-  const exchangeLei = () => {
-    return (billValue * lei).toFixed(2);
-  }
-  const exchangeEurToLei = () => {
-    return (billValue / lei).toFixed(2);
-  }
-  const exchangeEurToUsd = () => {
-    return (billValue / usd).toFixed(2);
-  }
-
+  
   const renderExchangeRates = () => {
-    switch(currencyISO) {
-      case 'EUR':
-        return (
-          <>
-            <Text category='h6'>{exchangeUsd()} USD</Text>
-            <Text> / </Text>
-            <Text category='h6' style={{textAlign:'right'}}>{exchangeLei()} LEI</Text>
-          </>
-        );
-        break;
-      case 'USD':
-        return (
-          <>
-            <Text category='h6'>{exchangeEurToUsd()} EUR</Text>
-          </>
-        );
-        break;
-      case 'LEI':
-        return (
-          <>
-            <Text category='h6'>{exchangeEurToLei()} EUR</Text>
-          </>
-        );
-        break;
-    }
+    let getExchangeValues = currencies.filter( (el) => { return el != currencyISO } );
+    console.log(currencyData);
+    return getExchangeValues.map( (item, idx) => {
+      return <Text style={{display: 'flex', width:110}} category='h6' key={idx}><Text category='label'>{item}</Text>: {( parseFloat(billValue) * parseFloat(currencyData[item]) ).toFixed(2)}</Text>;
+    });
   }
 
   useEffect(() => {
     setCurrencyISO(getCurrencyISO);
   }, [selectedCurrency]);
 
+  const renderCat = () => {
+    return (
+      <Pressable onPress={() => setVisible(true)}>
+        <Text category='h6'> /\_/\ </Text>
+        <Text category='h6'>( o.o )</Text>
+        <Text category='h6'> {'>'} ^ {'<'} </Text>
+      </Pressable>
+    )
+  };
+
   return (
     <Layout style={styles.container}>
     <Layout style={styles.layout} level='1'>
-      <Text category='h1' style={{marginBottom:20}}>Tippy<Text category='s2'>(like Clippy but for Tips)</Text></Text>
+      <Layout style={{display:'flex', flexDirection:'row', alignSelf:'center', justifyContent:'space-evenly', alignItems:'center', marginTop:5}}>
+        <Text category='h1' style={{display:'flex', marginBottom:20,marginRight:25,alignSelf:'center', justifyContent:'center', alignItems:'center'}}>Tippy<Text category='s2'>(like Clippy but for Tips)</Text></Text>
+          <Popover
+            visible={visible}
+            anchor={renderCat}
+            onBackdropPress={() => setVisible(false)}>
+              <Layout>
+                <Pressable onPress={() => Linking.openURL('https://www.buymeacoffee.com/alyn3d')}>
+                  <Text style={{padding:20}}>Buy me a coffee? 😻</Text>
+                </Pressable>
+              </Layout>
+          </Popover>                  
+      </Layout>
       <Text>How much is your bill?</Text>
       <Layout style={[styles.row]}>
         <Input
@@ -136,12 +142,22 @@ export const Home = () => {
           size='large'
           placeholder={`0 ${currencyISO}`}
           keyboardType='phone-pad'
-          onChangeText={(e) => setBillValue(e)}
+          onChangeText={(e) => setBillValue(Number(e))}
         />
-        <Select value={getCurrencyISO()} size='large' selectedIndex={selectedCurrency} onSelect={index => setSelectedCurrency(index)} style={[styles.input, {flex:.5}]}>
+        <Select value={getCurrencyISO()} size='large' selectedIndex={selectedCurrency} onSelect={index => {setBillValue(0); setSelectedCurrency(index)}} style={[styles.input, {flex:.5}]}>
           <SelectItem title='EUR' />
           <SelectItem title='USD' />
-          <SelectItem title='LEI' />
+          <SelectItem title='RON' />
+          <SelectItem title='BGN' />
+          <SelectItem title='CZK' />
+          <SelectItem title='DKK' />
+          <SelectItem title='GBP' />
+          <SelectItem title='HRK' />
+          <SelectItem title='HUF' />
+          <SelectItem title='PLN' />
+          <SelectItem title='RUB' />
+          <SelectItem title='SEK' />
+          <SelectItem title='TRY' />
         </Select>
       </Layout>
       <Layout style={{flexDirection:'column', alignSelf:'center'}}>
@@ -176,8 +192,8 @@ export const Home = () => {
       </Layout>
       <Layout style={{alignSelf:'center', justifyContent:'center', alignItems:'center', marginTop:15}}>
         <Layout>
-          <Text>You are spending</Text>
-          <Layout style={{flexDirection:'row'}}>
+          <Text>Your bill was equal to</Text>
+          <Layout style={{flexDirection:'row', width:'100%', flexWrap:'wrap', marginTop:5}}>
             {
               renderExchangeRates()
             }
@@ -190,11 +206,6 @@ export const Home = () => {
         </Button>
       </Layout>
       <Text category='c2' style={{alignSelf:'center'}}>Simply hit the button and send your friend all the details.</Text>
-      <Layout style={{alignSelf:'center', justifyContent:'center', alignItems:'center', marginTop:25}}>
-        <Text category='h6'> /\_/\ </Text>
-        <Text category='h6'>( o.o )</Text>
-        <Text category='h6'> {'>'} ^ {'<'} </Text>
-      </Layout>
     </Layout>
   </Layout>
   );
