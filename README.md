@@ -1,5 +1,5 @@
 # Tippy - Tip and split calculator
-![tippy-cover](https://user-images.githubusercontent.com/11836158/126034734-ef686892-ed22-45bc-a794-5b984f622ba2.jpg)
+![tippy-cover](https://user-images.githubusercontent.com/11836158/154131749-a9c72d31-111e-4b86-be5b-f32a8af39629.jpg)
 
 ***
 <p align='center'>
@@ -19,8 +19,8 @@ The app also fetches the latest exchange rates based on the selected currency an
 - See what you're spending in other currencies
 
 ## Technologies
-- expo (~42.0.1)
-- react (16.13.1)
+- expo (^44.0.0)
+- react (17.0.1)
 - ui-kitten (^5.1.0)
 
 ## Support
