@@ -11,7 +11,7 @@ export const Home = () => {
   const [currencyData, setCurrencyData] = useState({});
   const [visible, setVisible] = useState(false);
 
-  const currencies = ['EUR','USD','RON','BGN','CZK','DKK','GBP','HRK','HUF','PLN','RUB','SEK','TRY'];
+  const currencies = ['EUR','USD','RON','BGN','CZK','DKK','GBP','HRK','HUF','PLN','NOK','SEK','TRY'];
 
   useEffect(() => {
     fetch(`https://api.frankfurter.app/latest?from=${currencyISO}`)
@@ -76,7 +76,7 @@ export const Home = () => {
         return 'PLN';
         break;
       case 10:
-        return 'RUB';
+        return 'NOK';
         break;
       case 11:
         return 'SEK';
@@ -155,7 +155,7 @@ export const Home = () => {
           <SelectItem title='HRK' />
           <SelectItem title='HUF' />
           <SelectItem title='PLN' />
-          <SelectItem title='RUB' />
+          <SelectItem title='NOK' />
           <SelectItem title='SEK' />
           <SelectItem title='TRY' />
         </Select>
