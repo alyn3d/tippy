@@ -17,6 +17,7 @@ The app also fetches the latest exchange rates based on the selected currency an
 - Split bill between multiple people
 - See total per person and what amount each person is tipping
 - See what you're spending in other currencies
+- dark or light mode (follows system theme)
 
 ## Technologies
 - expo (^44.0.0)
