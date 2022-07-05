@@ -139,8 +139,8 @@ export const Home = ( { theme }:AppProps ) => {
               anchor={renderCat}
               onBackdropPress={() => setVisible(false)}>
                 <Layout>
-                  <Pressable onPress={() => Linking.openURL('https://www.buymeacoffee.com/alyn3d')}>
-                    <Text style={{padding:20}}>Buy me a coffee? 😻</Text>
+                  <Pressable onPress={() => Linking.openURL('https://linktr.ee/alyn3d')}>
+                    <Text style={{padding:20}}>Find me on the web! 😻</Text>
                   </Pressable>
                 </Layout>
             </Popover>                  
