@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Share, StatusBar, Pressable, Linking } from 'react-native';
+import { StyleSheet, Share, Pressable, StatusBar, Linking } from 'react-native';
 import { Layout, Text, Input, ButtonGroup, Button, Select, SelectItem, IndexPath, Popover } from '@ui-kitten/components';
 
 type AppProps = {
@@ -16,11 +16,6 @@ export const Home = ( { theme }:AppProps ) => {
   const [visible, setVisible] = useState(false);
 
   const currencies = ['EUR','USD','RON','BGN','CZK','DKK','GBP','HRK','HUF','PLN','NOK','SEK','TRY'];
-
-  //Set theme
-  useEffect(() => {
-    StatusBar.setBarStyle(theme === 'light' ? 'dark-content' : 'light-content');
-  }, []);
 
   useEffect(() => {
     fetch(`https://api.frankfurter.app/latest?from=${currencyISO}`)
