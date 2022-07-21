@@ -1,5 +1,6 @@
 # Tippy - Tip and split calculator
-![tippy-cover](https://user-images.githubusercontent.com/11836158/154131749-a9c72d31-111e-4b86-be5b-f32a8af39629.jpg)
+![tippy-cover](https://user-images.githubusercontent.com/11836158/180252509-188699de-2d84-47e8-8671-87de39d0b074.jpg)
+
 
 ***
 <p align='center'>
