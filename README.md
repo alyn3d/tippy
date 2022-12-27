@@ -21,8 +21,8 @@ The app also fetches the latest exchange rates based on the selected currency an
 - dark or light mode (follows system theme)
 
 ## Technologies
-- expo (^44.0.0)
-- react (17.0.1)
+- expo (^47.0.0)
+- react (18.1.0)
 - ui-kitten (^5.1.0)
 
 ## Support

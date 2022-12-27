@@ -26,7 +26,7 @@ export default function App() {
   return (
       <ApplicationProvider {...eva} theme={colorScheme === 'light' ? eva.light : eva.dark}>
         <ExpoStatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        <Home theme={colorScheme} />
+        <Home />
       </ApplicationProvider>    
   );
 };

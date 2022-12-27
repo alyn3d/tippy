@@ -2,17 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Share, Pressable, StatusBar, Linking } from 'react-native';
 import { Layout, Text, Input, ButtonGroup, Button, Select, SelectItem, IndexPath, Popover } from '@ui-kitten/components';
 
-type AppProps = {
-  theme: string
-}
 
-export const Home = ( { theme }:AppProps ) => {
-  const [selectedCurrency, setSelectedCurrency] = useState(new IndexPath(0));
+export const Home = () => {
+  const [selectedCurrency, setSelectedCurrency] = useState<any>(new IndexPath(0));
   const [currencyISO, setCurrencyISO] = useState('');
-  const [billValue, setBillValue] = useState(0);
-  const [tipPercentage, setTipPercentage] = useState(15);
-  const [people, setPeople] = useState(1);
-  const [currencyData, setCurrencyData] = useState({});
+  const [billValue, setBillValue] = useState<number>(0);
+  const [tipPercentage, setTipPercentage] = useState<number>(15);
+  const [people, setPeople] = useState<number>(1);
+  const [currencyData, setCurrencyData] = useState<any>({});
   const [visible, setVisible] = useState(false);
 
   const currencies = ['EUR','USD','RON','BGN','CZK','DKK','GBP','HRK','HUF','PLN','NOK','SEK','TRY'];
@@ -41,14 +38,14 @@ export const Home = ( { theme }:AppProps ) => {
   }
 
   const calculateTotalPerPerson = () => {
-    let percentage = (parseFloat(billValue)/100)*parseInt(tipPercentage);
-    let total = ( (parseFloat(billValue) + parseFloat(percentage)) / parseInt(people) ).toFixed(2);
+    let percentage = (billValue/100)*tipPercentage;
+    let total:number = Number(( (billValue + percentage) / people ).toFixed(2));
     return isNaN(total) ? 0 : total;
   }
 
   const calculateTotalTipPerPerson = () => {
-    let percentage = (billValue/100)*tipPercentage;
-    return (parseFloat(percentage) / parseInt(people)).toFixed(2);
+    let percentage:number = (billValue/100)*tipPercentage;
+    return Number((percentage / people).toFixed(2));
   }
   const getCurrencyISO = () => {
     switch (selectedCurrency.row) {
@@ -105,7 +102,7 @@ export const Home = ( { theme }:AppProps ) => {
     let getExchangeValues = currencies.filter( (el) => { return el != currencyISO } );
     //console.log(currencyData);
     return getExchangeValues.map( (item, idx) => {
-      let convertedValue = ( parseFloat(billValue) * parseFloat(currencyData[item]) ).toFixed(2);
+      let convertedValue = ( billValue * parseFloat(currencyData[item]) ).toFixed(2);
       return <Text style={{display: 'flex', width:110}} category='h6' key={idx}><Text category='label'>{item}</Text>: {convertedValue.split('.')[0].length > 4 ? convertedValue.slice(0, 5) : convertedValue}</Text>;
     });
   }
@@ -180,7 +177,7 @@ export const Home = ( { theme }:AppProps ) => {
           <Layout style={styles.row}>
               <ButtonGroup style={styles.buttonGroup} appearance='outline'>
                 <Button onPress={lessPeople}>-</Button>
-                <Button status='primary' style={{width:150}}>{people} {people != 1 ? 'persons' : 'person'}</Button>
+                <Button status='primary' style={{width:150}}>{`${people} ${people != 1 ? 'persons' : 'person'}`}</Button>
                 <Button onPress={morePeople}>+</Button>
               </ButtonGroup>
           </Layout>
