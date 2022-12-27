@@ -1,29 +1,82 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Share, Pressable, StatusBar, Linking } from 'react-native';
+import * as Network from 'expo-network';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { StyleSheet, Share, Pressable, StatusBar, Linking, ToastAndroid } from 'react-native';
 import { Layout, Text, Input, ButtonGroup, Button, Select, SelectItem, IndexPath, Popover } from '@ui-kitten/components';
 
 type AppProps = {
-  theme: string
+  theme: string,
 }
 
 export const Home = ( { theme }:AppProps ) => {
-  const [selectedCurrency, setSelectedCurrency] = useState(new IndexPath(0));
+  const [iHaveInternet, setIhaveInternet] = useState<boolean | undefined>(false);
+  const [selectedCurrency, setSelectedCurrency] = useState<any>(new IndexPath(0));
   const [currencyISO, setCurrencyISO] = useState('');
-  const [billValue, setBillValue] = useState(0);
-  const [tipPercentage, setTipPercentage] = useState(15);
-  const [people, setPeople] = useState(1);
-  const [currencyData, setCurrencyData] = useState({});
+  const [billValue, setBillValue] = useState<number>(0);
+  const [tipPercentage, setTipPercentage] = useState<number>(15);
+  const [people, setPeople] = useState<number>(1);
+  const [currencyData, setCurrencyData] = useState<any>({});
   const [visible, setVisible] = useState(false);
 
   const currencies = ['EUR','USD','RON','BGN','CZK','DKK','GBP','HRK','HUF','PLN','NOK','SEK','TRY'];
 
-  useEffect(() => {
-    fetch(`https://api.frankfurter.app/latest?from=${currencyISO}`)
+    //Check network connection
+    useEffect(() => {
+      const checkInternetReachable = async () => {
+        let { isConnected, isInternetReachable } = await Network.getNetworkStateAsync();
+        console.log('Is Connected: ', isConnected);
+        console.log('I haz internet: ', isInternetReachable);
+        setIhaveInternet(isInternetReachable);
+      }
+  
+      setTimeout(() => {
+        checkInternetReachable();
+      }, 1000);
+      
+      //Check state
+      //console.log('I haz internet: ', iHaveInternet);
+    }, [])
+
+  //If there's an internet connection, get currency exchange rates
+  const getExchangeRate = async (currency:string) => {
+    fetch(`https://api.frankfurter.app/latest?from=${currency}`)
       .then(resp => resp.json())
       .then((data) => {
         setCurrencyData(data.rates);
       })
       .catch(err => console.log(err));
+  };
+
+  useEffect(() => {
+    const getRates = async () => {
+      if (iHaveInternet) {
+        currencies.forEach(async (currency) => {
+          console.log(currency);
+          await axios.get(`https://api.frankfurter.app/latest?from=${JSON.stringify(currency)}`).then(r => {
+            AsyncStorage.setItem(JSON.stringify(currency), r.data.rates);
+          }).catch(err => console.error(err));
+
+        });
+      } else {
+        ToastAndroid.show('No internet. Using old exchange values', ToastAndroid.LONG);
+      }
+    }
+    setTimeout(() => {
+      getRates();
+    }, 5000)
+    
+  }, [iHaveInternet]);
+
+  useEffect(() => {
+    let currentCurrencyRates = AsyncStorage.getItem(currencyISO);
+    setCurrencyData(currentCurrencyRates);
+    // fetch(`https://api.frankfurter.app/latest?from=${currencyISO}`)
+    //   .then(resp => resp.json())
+    //   .then((data) => {
+    //     setCurrencyData(data.rates);
+    //   })
+    //   .catch(err => console.log(err));
   }, [currencyISO]);
 
   const morePeople = () => {
@@ -41,14 +94,14 @@ export const Home = ( { theme }:AppProps ) => {
   }
 
   const calculateTotalPerPerson = () => {
-    let percentage = (parseFloat(billValue)/100)*parseInt(tipPercentage);
-    let total = ( (parseFloat(billValue) + parseFloat(percentage)) / parseInt(people) ).toFixed(2);
+    let percentage:number = (billValue/100)*tipPercentage;
+    let total:number = Number(( (billValue + percentage) / people ).toFixed(2));
     return isNaN(total) ? 0 : total;
   }
 
   const calculateTotalTipPerPerson = () => {
-    let percentage = (billValue/100)*tipPercentage;
-    return (parseFloat(percentage) / parseInt(people)).toFixed(2);
+    let percentage:number = (billValue/100)*tipPercentage;
+    return (percentage / people).toFixed(2);
   }
   const getCurrencyISO = () => {
     switch (selectedCurrency.row) {
@@ -105,7 +158,7 @@ export const Home = ( { theme }:AppProps ) => {
     let getExchangeValues = currencies.filter( (el) => { return el != currencyISO } );
     //console.log(currencyData);
     return getExchangeValues.map( (item, idx) => {
-      let convertedValue = ( parseFloat(billValue) * parseFloat(currencyData[item]) ).toFixed(2);
+      let convertedValue = ( billValue * currencyData[item] ).toFixed(2);
       return <Text style={{display: 'flex', width:110}} category='h6' key={idx}><Text category='label'>{item}</Text>: {convertedValue.split('.')[0].length > 4 ? convertedValue.slice(0, 5) : convertedValue}</Text>;
     });
   }

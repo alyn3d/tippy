@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
 import * as eva from '@eva-design/eva';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';

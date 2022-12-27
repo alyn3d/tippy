@@ -11,7 +11,7 @@
     "@eva-design/eva": "^2.1.0",
     "@react-native-async-storage/async-storage": "~1.15.0",
     "@ui-kitten/components": "^5.1.0",
-    "axios": "^0.21.1",
+    "axios": "^0.27.2",
     "expo": "^44.0.0",
     "expo-navigation-bar": "~1.1.1",
     "expo-network": "~4.1.0",
