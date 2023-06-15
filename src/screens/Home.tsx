@@ -12,7 +12,7 @@ export const Home = () => {
   const [currencyData, setCurrencyData] = useState<any>({});
   const [visible, setVisible] = useState(false);
 
-  const currencies = ['EUR','USD','RON','BGN','CZK','DKK','GBP','HRK','HUF','PLN','NOK','SEK','TRY'];
+  const currencies = ['EUR','USD','RON','BGN','CZK','DKK','GBP','CAD','HUF','PLN','NOK','SEK','TRY'];
 
   useEffect(() => {
     fetch(`https://api.frankfurter.app/latest?from=${currencyISO}`)
@@ -68,7 +68,7 @@ export const Home = () => {
         return 'GBP';
         break;
       case 7:
-        return 'HRK';
+        return 'CAD';
         break;
       case 8:
         return 'HUF';
@@ -101,10 +101,10 @@ export const Home = () => {
   const renderExchangeRates = () => {
     let getExchangeValues = currencies.filter( (el) => { return el != currencyISO } );
     //console.log(currencyData);
-    return getExchangeValues.map( (item, idx) => {
+    return currencyData ? getExchangeValues.map( (item, idx) => {
       let convertedValue = ( billValue * parseFloat(currencyData[item]) ).toFixed(2);
       return <Text style={{display: 'flex', width:110}} category='h6' key={idx}><Text category='label'>{item}</Text>: {convertedValue.split('.')[0].length > 4 ? convertedValue.slice(0, 5) : convertedValue}</Text>;
-    });
+    }) : null;
   }
 
   useEffect(() => {
@@ -154,7 +154,7 @@ export const Home = () => {
             <SelectItem title='CZK' />
             <SelectItem title='DKK' />
             <SelectItem title='GBP' />
-            <SelectItem title='HRK' />
+            <SelectItem title='CAD' />
             <SelectItem title='HUF' />
             <SelectItem title='PLN' />
             <SelectItem title='NOK' />
