@@ -19,15 +19,16 @@ The app also fetches the latest exchange rates based on the selected currency an
 - See total per person and what amount each person is tipping
 - See what you're spending in other currencies
 - dark or light mode (follows system theme)
+- Offline mode! Tippy has an included currency conversion rate data file. Once you get online, updated currency data is saved to localstorage to be used when you're offline.
 
 ## Technologies
-- expo (^49.0.0)
+- expo (^51.0.32)
 - react (18.2.0)
-- ui-kitten (^5.1.0)
+- ui-kitten (^5.3.1)
 
 ## Support
 I do this so I can learn some stuff and have some fun, but if you want to... you can
 <p><a href="https://www.buymeacoffee.com/alyn3d"><img width="208" alt="buy-me-a-coffee" src="https://user-images.githubusercontent.com/11836158/115165880-c7b6ba80-a0b8-11eb-9b86-a65810c9969c.png"></a><p>
 
-Created with 💙 by [alyn3d](https://github.com/alyn3d)
+Created with 💙 by [alyn3d](https://alinion.dev)
   
