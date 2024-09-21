@@ -11,7 +11,6 @@ const OfflineScreen = () => {
   useEffect(() => {
     const fetchDate = async () => {
       const date = await getDate();
-      console.log(date);
       if (date !== null) {
         setOfflineDate(date);
       }

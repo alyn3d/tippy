@@ -56,7 +56,7 @@ const Home: React.FC<HomeProps> = ({ isOffline }) => {
       .then((data) => {
         setCurrencyData(data.rates);
       })
-      .catch(err => console.log(err));
+      .catch(err => console.error(err));
     }
   }, [currencyISO]);
 
