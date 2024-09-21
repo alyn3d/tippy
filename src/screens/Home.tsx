@@ -129,7 +129,7 @@ const Home: React.FC<HomeProps> = ({ isOffline }) => {
               anchor={renderCat}
               onBackdropPress={() => setVisible(false)}>
                 <Layout>
-                  <Pressable onPress={() => Linking.openURL('https://linktr.ee/alyn3d')}>
+                  <Pressable onPress={() => Linking.openURL('https://alinion.dev')}>
                     <Text style={{padding:20}}>Find me on the web! 😻</Text>
                   </Pressable>
                 </Layout>

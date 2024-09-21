@@ -11,7 +11,8 @@ import Home from './src/screens/Home';
 import LoadingScreen from './src/screens/LoadingScreen';
 import OfflineScreen from './src/screens/OfflineScreen';
 
-import {clearAllData} from './src/helpers/asyncStorage';
+// This is used to clear data from storage (testing purposes)
+//import {clearAllData} from './src/helpers/asyncStorage';
 
 
 export default function App() {
@@ -51,7 +52,7 @@ export default function App() {
       setShowOffline(true);
       setTimeout(() => {
         setIsOffline(false);
-      }, 1000);
+      }, 2000);
     } else {
       setShowOffline(false);
     }
