@@ -1,14 +1,33 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useColorScheme } from 'react-native';
+
 import * as eva from '@eva-design/eva';
+import { ApplicationProvider } from '@ui-kitten/components';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import * as NavigationBar from 'expo-navigation-bar';
-import { ApplicationProvider } from '@ui-kitten/components';
-import { Home } from './src/screens/Home';
+import * as Network from 'expo-network';
+
+import Home from './src/screens/Home';
+import LoadingScreen from './src/screens/LoadingScreen';
+import OfflineScreen from './src/screens/OfflineScreen';
+
+import {clearAllData} from './src/helpers/asyncStorage';
+
 
 export default function App() {
+  const [isOffline, setIsOffline] = useState<boolean>(false);
+  const [showOffline, setShowOffline] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const colorScheme = useColorScheme();
-  //console.log(colorScheme);
+
+  // clearAllData();
+  
+  const getOfflineMode = async () => {
+    const networkState = await Network.getNetworkStateAsync();
+    setIsOffline(!networkState.isInternetReachable);
+    setLoading(false);
+  }
+
   useEffect(() => {
     const setNavBarColorScheme = async () => {
       if (colorScheme === 'light') {
@@ -21,12 +40,34 @@ export default function App() {
     }
 
     setNavBarColorScheme();
+
+    getOfflineMode();
   }, []);
+
+  useEffect(() => {
+    if (loading) return;
+    
+    if (isOffline) {
+      setShowOffline(true);
+      setTimeout(() => {
+        setIsOffline(false);
+      }, 1000);
+    } else {
+      setShowOffline(false);
+    }
+  }, [loading, isOffline]);
+
+  const ShowHome = () => {
+    return !loading && <Home isOffline={isOffline} />;
+  };
 
   return (
       <ApplicationProvider {...eva} theme={colorScheme === 'light' ? eva.light : eva.dark}>
         <ExpoStatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        <Home />
+        <Suspense fallback={<LoadingScreen />}>
+          {showOffline && <OfflineScreen />}
+          {loading ? <LoadingScreen /> : <ShowHome />}
+        </Suspense>
       </ApplicationProvider>    
   );
 };
