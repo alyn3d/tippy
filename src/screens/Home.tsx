@@ -2,25 +2,62 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Share, Pressable, StatusBar, Linking } from 'react-native';
 import { Layout, Text, Input, ButtonGroup, Button, Select, SelectItem, IndexPath, Popover } from '@ui-kitten/components';
 
+// Helpers
+import { offlineCurrencyData } from '../data/offlineCurrencyData';
+import { fetchAllCurrenciesData } from '../helpers/getAllCurrencyData';
+import { storeData, getData, storeDate, getDate } from '../helpers/asyncStorage';
+import { getCurrentFormattedDate } from '../helpers/getFormattedDate';
 
-export const Home = () => {
+interface HomeProps {
+  isOffline: boolean
+};
+
+const Home: React.FC<HomeProps> = ({ isOffline }) => {
   const [selectedCurrency, setSelectedCurrency] = useState<any>(new IndexPath(0));
   const [currencyISO, setCurrencyISO] = useState('');
   const [billValue, setBillValue] = useState<number>(0);
   const [tipPercentage, setTipPercentage] = useState<number>(15);
   const [people, setPeople] = useState<number>(1);
   const [currencyData, setCurrencyData] = useState<any>({});
+  const [offlineCurrencies, setOfflineCurrencies] = useState<any>(offlineCurrencyData);
   const [visible, setVisible] = useState(false);
 
-  const currencies = ['EUR','USD','RON','BGN','CZK','DKK','GBP','CAD','HUF','PLN','NOK','SEK','TRY'];
+  const currencies:string[] = ['EUR','USD','RON','BGN','CZK','DKK','GBP','CAD','HUF','PLN','NOK','SEK','TRY'];
+
+  // Get the latest conversion rates for offline use
+  useEffect(() => {
+    const fetchOfflineData = async () => {
+      const offlineCurrencyDataForAsyncStorage = await fetchAllCurrenciesData(currencies);
+
+      storeData(offlineCurrencyDataForAsyncStorage);
+      storeDate(getCurrentFormattedDate());
+    }
+
+    const initializeData = async () => {
+      if (!isOffline) {
+        await fetchOfflineData();
+      }
+
+      if (isOffline && await getData() !== null) {
+        setOfflineCurrencies(await getData());
+        storeDate(await getDate());
+      }
+    };
+
+    initializeData();
+  }, []);
 
   useEffect(() => {
-    fetch(`https://api.frankfurter.app/latest?from=${currencyISO}`)
+    if (isOffline) {
+      setCurrencyData(offlineCurrencies[currencyISO]);
+    } else {
+      fetch(`https://api.frankfurter.app/latest?from=${currencyISO}`)
       .then(resp => resp.json())
       .then((data) => {
         setCurrencyData(data.rates);
       })
-      .catch(err => console.log(err));
+      .catch(err => console.error(err));
+    }
   }, [currencyISO]);
 
   const morePeople = () => {
@@ -48,46 +85,7 @@ export const Home = () => {
     return Number((percentage / people).toFixed(2));
   }
   const getCurrencyISO = () => {
-    switch (selectedCurrency.row) {
-      case 1:
-        return 'USD';
-        break;
-      case 2:
-        return 'RON';
-        break;
-      case 3:
-        return 'BGN';
-        break;
-      case 4:
-        return 'CZK';
-        break;
-      case 5:
-        return 'DKK';
-        break;
-      case 6:
-        return 'GBP';
-        break;
-      case 7:
-        return 'CAD';
-        break;
-      case 8:
-        return 'HUF';
-        break;
-      case 9:
-        return 'PLN';
-        break;
-      case 10:
-        return 'NOK';
-        break;
-      case 11:
-        return 'SEK';
-        break;
-      case 12:
-        return 'TRY';
-        break;
-      default: 
-        return 'EUR'
-    };
+    return currencies[selectedCurrency.row];
   };
 
   const shareDialog = () => {
@@ -99,9 +97,9 @@ export const Home = () => {
   };
   
   const renderExchangeRates = () => {
-    let getExchangeValues = currencies.filter( (el) => { return el != currencyISO } );
-    //console.log(currencyData);
-    return currencyData ? getExchangeValues.map( (item, idx) => {
+    let getExchangeValues = currencies.filter( (el:any) => { return el != currencyISO } );
+
+    return currencyData ? getExchangeValues.map( (item:any, idx:number) => {
       let convertedValue = ( billValue * parseFloat(currencyData[item]) ).toFixed(2);
       return <Text style={{display: 'flex', width:110}} category='h6' key={idx}><Text category='label'>{item}</Text>: {convertedValue.split('.')[0].length > 4 ? convertedValue.slice(0, 5) : convertedValue}</Text>;
     }) : null;
@@ -131,7 +129,7 @@ export const Home = () => {
               anchor={renderCat}
               onBackdropPress={() => setVisible(false)}>
                 <Layout>
-                  <Pressable onPress={() => Linking.openURL('https://linktr.ee/alyn3d')}>
+                  <Pressable onPress={() => Linking.openURL('https://alinion.dev')}>
                     <Text style={{padding:20}}>Find me on the web! 😻</Text>
                   </Pressable>
                 </Layout>
@@ -147,19 +145,7 @@ export const Home = () => {
             onChangeText={(e) => setBillValue(Number(e))}
           />
           <Select value={getCurrencyISO()} size='large' selectedIndex={selectedCurrency} onSelect={index => {setBillValue(0); setSelectedCurrency(index)}} style={[styles.input, {flex:.5}]}>
-            <SelectItem title='EUR' />
-            <SelectItem title='USD' />
-            <SelectItem title='RON' />
-            <SelectItem title='BGN' />
-            <SelectItem title='CZK' />
-            <SelectItem title='DKK' />
-            <SelectItem title='GBP' />
-            <SelectItem title='CAD' />
-            <SelectItem title='HUF' />
-            <SelectItem title='PLN' />
-            <SelectItem title='NOK' />
-            <SelectItem title='SEK' />
-            <SelectItem title='TRY' />
+            {currencies.map((item:string) => <SelectItem key={item} title={item} />)}
           </Select>
         </Layout>
         <Layout style={{flexDirection:'column', alignSelf:'center'}}>
@@ -212,6 +198,8 @@ export const Home = () => {
     </Layout>
   );
 };
+
+export default Home;
 
 const styles = StyleSheet.create({
   container: {
