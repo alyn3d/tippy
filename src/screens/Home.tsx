@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, Share, Pressable, StatusBar, Linking } from 'react-native';
 import { Layout, Text, Input, ButtonGroup, Button, Select, SelectItem, IndexPath, Popover } from '@ui-kitten/components';
 
@@ -96,14 +96,21 @@ const Home: React.FC<HomeProps> = ({ isOffline }) => {
     });
   };
   
-  const renderExchangeRates = () => {
-    let getExchangeValues = currencies.filter( (el:any) => { return el != currencyISO } );
-
-    return currencyData ? getExchangeValues.map( (item:any, idx:number) => {
-      let convertedValue = ( billValue * parseFloat(currencyData[item]) ).toFixed(2);
-      return <Text style={{display: 'flex', width:110}} category='h6' key={idx}><Text category='label'>{item}</Text>: {convertedValue.split('.')[0].length > 4 ? convertedValue.slice(0, 5) : convertedValue}</Text>;
-    }) : null;
-  }
+  const renderExchangeRates = useCallback(() => {
+    let getExchangeValues = currencies.filter((el: any) => el !== currencyISO);
+  
+    return currencyData
+      ? getExchangeValues.map((item: any, idx: number) => {
+          let convertedValue = (billValue * parseFloat(currencyData[item])).toFixed(2);
+          return (
+            <Text style={{ display: 'flex', width: 110 }} category="h6" key={idx}>
+              <Text category="label">{item}</Text>: 
+              {convertedValue.split('.')[0].length > 4 ? convertedValue.slice(0, 5) : convertedValue}
+            </Text>
+          );
+        })
+      : null;
+  }, [currencyData, currencies, currencyISO, billValue]);
 
   useEffect(() => {
     setCurrencyISO(getCurrencyISO);
