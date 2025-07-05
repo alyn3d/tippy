@@ -99,17 +99,21 @@ const Home: React.FC<HomeProps> = ({ isOffline }) => {
   const renderExchangeRates = useCallback(() => {
     let getExchangeValues = currencies.filter((el: any) => el !== currencyISO);
   
-    return currencyData
-      ? getExchangeValues.map((item: any, idx: number) => {
-          let convertedValue = (billValue * parseFloat(currencyData[item])).toFixed(2);
-          return (
-            <Text style={{ display: 'flex', width: 110 }} category="h6" key={idx}>
-              <Text category="label">{item}</Text>: 
-              {convertedValue.split('.')[0].length > 4 ? convertedValue.slice(0, 5) : convertedValue}
-            </Text>
-          );
-        })
-      : null;
+    // Prevent rendering until currencyData is available and has the required rates
+    if (!currencyData || Object.keys(currencyData).length === 0) return null;
+
+    return getExchangeValues.map((item: any, idx: number) => {
+      // Only render if the rate exists for this currency
+      const rate = parseFloat(currencyData[item]);
+      if (isNaN(rate)) return null;
+      const convertedValue = (billValue * rate).toFixed(2);
+      return (
+      <Text style={{ display: 'flex', width: 110 }} category="h6" key={idx}>
+        <Text category="label">{item}</Text>:
+        {convertedValue.split('.')[0].length > 4 ? convertedValue.slice(0, 5) : convertedValue}
+      </Text>
+      );
+    });
   }, [currencyData, currencies, currencyISO, billValue]);
 
   useEffect(() => {
